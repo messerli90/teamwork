@@ -1,0 +1,53 @@
+{
+    "name": "messerli90/teamwork",
+    "description": "User to Team associations with invitation system for Laravel",
+    "keywords": [
+        "messerli90",
+        "teamwork"
+    ],
+    "homepage": "https://github.com/messerli90/teamwork",
+    "license": "MIT",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Michael Messerli",
+            "email": "michaelamesserli@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^7.1",
+        "illuminate/support": "^6.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^4.0",
+        "phpunit/phpunit": "^8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Messerli90\\Teamwork\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Messerli90\\Teamwork\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
+
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Messerli90\\Teamwork\\TeamworkServiceProvider"
+            ],
+            "aliases": {
+                "Teamwork": "Messerli90\\Teamwork\\Facades\\Teamwork"
+            }
+        }
+    }
+}
