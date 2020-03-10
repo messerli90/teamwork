@@ -62,6 +62,8 @@ trait HasTeams
     }
 
     /**
+     * Helper function that returns the id of a given team
+     *
      * @param $team
      * @return mixed
      */
@@ -167,6 +169,26 @@ trait HasTeams
         foreach ($teams as $team) {
             $this->detachTeam($team);
         }
+        return $this;
+    }
+
+    public function switchRole($team, $role)
+    {
+        $team = $this->retrieveTeamId($team);
+
+        $available_roles = Config::get('teamwork.member_roles');
+        if (!in_array($role, $available_roles)) {
+            throw new \Exception('Provided role is invalid. Allowed roles: ' . Config::get('teamwork.member_roles'));
+        }
+
+        $this->teams()->syncWithoutDetaching([
+            $team => ['role' => $role]
+        ]);
+
+        if ($this->relationLoaded('teams')) {
+            $this->load('teams');
+        }
+
         return $this;
     }
 }

@@ -29,7 +29,16 @@ trait HasMembers
      */
     public function invites()
     {
-        return $this->hasMany(Config::get('teamwork.invite_model'), 'team_id', 'id');
+        return $this->hasMany(Config::get('teamwork.invite_model'), 'team_id', 'id')->where('type', 'invite');
+    }
+
+    /**
+     * One-to-Many relation with the invite model
+     * @return mixed
+     */
+    public function requests()
+    {
+        return $this->hasMany(Config::get('teamwork.invite_model'), 'team_id', 'id')->where('type', 'request');
     }
 
     /**

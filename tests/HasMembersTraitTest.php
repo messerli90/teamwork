@@ -9,9 +9,7 @@ use Messerli90\Teamwork\Tests\Models\User;
 
 class HasMembersTraitTest extends TestCase
 {
-    protected $user;
     protected $team;
-    protected $invite;
 
     /**
      * Setup the test environment.
@@ -21,16 +19,6 @@ class HasMembersTraitTest extends TestCase
         parent::setUp();
 
         $this->team = factory(Team::class)->create();
-        $this->user = factory(User::class)->create();
-
-        $this->invite               = new TeamInvite();
-        $this->invite->team_id      = $this->team->getKey();
-        $this->invite->user_id      = $this->team->owner_id;
-        $this->invite->email        = $this->user->email;
-        $this->invite->type         = 'invite';
-        $this->invite->accept_token = md5(uniqid(microtime()));
-        $this->invite->deny_token   = md5(uniqid(microtime()));
-        $this->invite->save();
     }
 
     /** @test */
@@ -40,19 +28,43 @@ class HasMembersTraitTest extends TestCase
     }
 
     /** @test */
-    public function get_invites()
+    public function team_has_many_invites()
     {
-        $invites = $this->user->invites()->get();
-        $this->assertCount(1, $invites);
-        // $this->assertEquals($this->invite->getKey(), $this->team->invites->first()->getKey());
+        factory(TeamInvite::class, 3)->create([
+            'type' => 'invite',
+            'team_id' => $this->team->getKey()
+        ]);
+        factory(TeamInvite::class, 3)->create([
+            'type' => 'request',
+            'team_id' => $this->team->getKey()
+        ]);
+
+        $this->assertCount(3, $this->team->invites);
     }
 
     /** @test */
-    public function get_users()
+    public function team_has_many_requests()
     {
-        $this->user->attachTeam($this->team);
-        $this->assertCount(2, $this->team->users);
-        // $this->assertEquals($this->user->getKey(), $this->team->users->first()->getKey());
+        factory(TeamInvite::class, 3)->create([
+            'type' => 'invite',
+            'team_id' => $this->team->getKey()
+        ]);
+        factory(TeamInvite::class, 3)->create([
+            'type' => 'request',
+            'team_id' => $this->team->getKey()
+        ]);
+
+        $this->assertCount(3, $this->team->requests);
+    }
+
+    /** @test */
+    public function team_has_many_users()
+    {
+        factory(User::class, 3)->create()->each(function ($user) {
+            $user->attachTeam($this->team);
+        });
+
+        $this->assertCount(4, $this->team->users);
     }
 
     /** @test */
@@ -62,15 +74,20 @@ class HasMembersTraitTest extends TestCase
     }
 
     /** @test */
-    public function get_owner()
+    public function team_has_owner()
     {
+        $this->assertInstanceOf(User::class, $this->team->owner);
+
         $this->assertEquals($this->team->owner_id, $this->team->owner->getKey());
     }
 
     /** @test */
-    public function check_user_belongs_to_team()
+    public function checks_user_belongs_to_team()
     {
-        $this->user->attachTeam($this->team);
-        $this->assertTrue($this->team->hasUser($this->user));
+        $tUser = factory(User::class)->create();
+
+        $tUser->attachTeam($this->team);
+
+        $this->assertTrue($this->team->hasUser($tUser));
     }
 }

@@ -16,41 +16,38 @@ class InviteTraitTest extends TestCase
     /**
      * Setup the test environment.
      */
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $this->user = factory(User::class)->create();
-        $this->team = factory(Team::class)->create();
-        $this->inviter = $this->team->owner;
-
-        $this->invite               = new TeamInvite();
-        $this->invite->team_id      = $this->team->getKey();
-        $this->invite->user_id      = $this->inviter->getKey();
-        $this->invite->email        = $this->user->email;
-        $this->invite->type         = 'invite';
-        $this->invite->accept_token = md5(uniqid(microtime()));
-        $this->invite->deny_token   = md5(uniqid(microtime()));
-        $this->invite->save();
-
-        auth()->login($this->user);
-    }
+    // public function setUp(): void
+    // {
+    //     parent::setUp();
+    //     // auth()->login($this->user);
+    // }
 
     /** @test */
-    public function get_teams()
+    public function get_team()
     {
-        $this->assertEquals($this->team->getKey(), $this->invite->team->getKey());
+        $invite = factory(TeamInvite::class)->create();
+        $this->assertInstanceOf(Team::class, $invite->team);
     }
 
     /** @test */
     public function get_user()
     {
-        $this->assertEquals($this->user->getKey(), $this->invite->user->getKey());
+        $user = factory(User::class)->create();
+        $invite = factory(TeamInvite::class)->create([
+            'email' => $user->email
+        ]);
+        $this->assertInstanceOf(User::class, $invite->user);
+        $this->assertEquals($user->email, $invite->email);
     }
 
     /** @test */
     public function get_inviter()
     {
-        $this->assertEquals($this->inviter->getKey(), $this->invite->inviter->getKey());
+        $inviter = factory(User::class)->create();
+        $invite = factory(TeamInvite::class)->create([
+            'user_id' => $inviter->getKey()
+        ]);
+        $this->assertInstanceOf(User::class, $invite->inviter);
+        $this->assertEquals($inviter->getKey(), $invite->user_id);
     }
 }

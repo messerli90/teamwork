@@ -36,6 +36,7 @@ class TeamworkTest extends TestCase
 
         $tInvite = TeamInvite::first();
         $this->assertEquals($tUser->email, $tInvite->email);
+        $this->assertEquals('invite', $tInvite->type);
     }
 
     /** @test */
@@ -81,6 +82,20 @@ class TeamworkTest extends TestCase
     }
 
     /** @test */
+    public function create_request_to_join_team()
+    {
+        $tTeam = factory(Team::class)->create();
+        $tUser = factory(User::class)->create();
+
+        $this->assertEquals(0, TeamInvite::count());
+        $this->teamwork->inviteToTeam($tUser, $tTeam->getKey(), 'request');
+        $this->assertEquals(1, TeamInvite::count());
+
+        $tInvite = TeamInvite::first();
+        $this->assertEquals('request', $tInvite->type);
+    }
+
+    /** @test */
     public function checks_if_user_has_pending_invite()
     {
         $tTeam = factory(Team::class)->create();
@@ -93,6 +108,18 @@ class TeamworkTest extends TestCase
 
         $this->assertTrue($hasInvite);
         $this->assertFalse($hasNotInvite);
+    }
+
+    /** @test */
+    public function returns_pending_invite_for_user()
+    {
+        $tTeam = factory(Team::class)->create();
+        $tUser = factory(User::class)->create();
+        $this->teamwork->inviteToTeam($tUser, $tTeam);
+
+        $tInvite = $this->teamwork->getPendingInvite($tUser, $tTeam);
+
+        $this->assertEquals($tUser->email, $tInvite->email);
     }
 
     /** @test */
