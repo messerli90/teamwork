@@ -135,6 +135,14 @@ $team = App\Team::find(1);
 $user->detachTeam($team);
 ```
 
+Switch User's role
+```php
+$user = App\User::find(1);
+$team = App\Team::find(1);
+
+$user->switchRole($team, 'moderator')
+```
+
 ### Testing
 
 ``` bash
@@ -164,8 +172,3 @@ This package used [mpociot/teamwork](https://github.com/mpociot/teamwork/) as a 
 ## License
 
 The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
-
-## Laravel Package Boilerplate
-
-This package was generated using the [Laravel Package Boilerplate](https://laravelpackageboilerplate.com).
-
